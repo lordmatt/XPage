@@ -52,6 +52,13 @@ class XPage {
         $this->setZone($what,$name);
     }
     
+    public function register_with_xpath($xpath,$name){
+        $zones = $this->page->actual_simpleXML_obj_please()->xpath($xpath);
+        foreach($zones as $zone){
+            $this->setZone($zone, $name);
+        }
+    }
+    
     // end of the line
     public function &go_back_up_by_one(){
         return $this;
@@ -63,7 +70,16 @@ class XPage {
     }
     
     public function setZone($pointer,$name){
-        $this->namedZones[$name]=$pointer;
+        if(!isset($this->namedZones[$name])){
+            $this->namedZones[$name]=$pointer;
+        }elseif(!is_array($this->namedZones[$name])){
+            $temp = $this->namedZones[$name];
+            $this->namedZones[$name] = array();
+            $this->namedZones[$name][] = $temp;
+            $this->namedZones[$name][] = $pointer; 
+        }else{
+            $this->namedZones[$name][] = $pointer; 
+        }
     }
     
     public function &getZone($name){
