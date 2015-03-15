@@ -61,6 +61,19 @@ class AEWrapper {
         return $result;
     }
     
+    public function pick_by_array($node,$array_point){
+        try {
+            $result = $this->MyAE->{$node}[$array_point];
+        } catch (Exception $e) {
+            $this->log_error('AEWrapper caught exception: ',  $e->getMessage());
+            return FALSE;
+        }
+        if(is_object($result)){
+            return new AEWrapper($result,$this);
+        }
+        return $result;
+    }
+    
     public function &actual_simpleXML_obj_please(){
         return $this->MyAE;
     }
