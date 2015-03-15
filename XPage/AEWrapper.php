@@ -60,7 +60,13 @@ class AEWrapper {
         }
         return $result;
     }
-    
+    /**
+     * Work arround the errors that passing an array through the wrapper craetes
+     * Not convinced that this is the best answer.
+     * @param type $node
+     * @param type $array_point
+     * @return boolean|\AEWrapper 
+     */
     public function pick_by_array($node,$array_point){
         try {
             $result = $this->MyAE->{$node}[$array_point];
