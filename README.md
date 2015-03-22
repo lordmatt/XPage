@@ -14,10 +14,10 @@ that are the system resource that is SXE to be a true object with tree awareness
 
 Added a new hack of a method which copes with the fact that 
 
-''' $XPage->page()->div 
+     $XPage->page()->div 
 
 is fine but
 
-''' $XPage->page()->div[1]
+     $XPage->page()->div[1]
 
 Throws a pink fit.
