@@ -97,13 +97,15 @@ class XPage {
     }
     */
 
-    public function asHTML(){
+    public function asHTML($forceDoctype=true){
         $doc = dom_import_simplexml($this->page->actual_simpleXML_obj_please());
         $doc->ownerDocument->encoding = 'iso-8859-1';
         $doc->ownerDocument->preserveWhiteSpace = false;
         $doc->ownerDocument->formatOutput = true;        
         $output = $doc->ownerDocument->saveXML($doc);
-        $output = "<!DOCTYPE html>\n" . $output; 
+        if($forceDoctype){
+            $output = "<!DOCTYPE html>\n" . $output;     
+        }
         return $output;
     }
     
