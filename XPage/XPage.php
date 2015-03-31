@@ -20,24 +20,31 @@ class XPage {
     // A list of pointers
     protected $namedZones = array();
 
-    public function __construct($page) {
+    /**
+     * Takes a HTML document (as string) or a path to a XHTML document
+     * @param string $page
+     * @param boolean $load_file
+     */
+    public function __construct($page,$load_file=false) {
         // AdvElement
         $doc = new DOMDocument();
         //$doc->strictErrorChecking = FALSE;
         libxml_use_internal_errors(true); // deal with less than valid HTML
-        
-        // Encoding problem quick fixes
-        $page = str_replace("\r\n", "\n", $page); // windows -> unix
-        $page = str_replace("\r", "\n", $page);   // remaining -> unix
-        
-        if (!$doc->loadHTML(mb_convert_encoding($page,'UTF-8'))) {
-            foreach (libxml_get_errors() as $error) {
-                // handle errors here
-                $this->log_error($this->display_xml_error($error));
-            }
-            libxml_clear_errors();
-        }
+        if($load_file){
+            $doc->load($page);
+        }else{
+            // Encoding problem quick fixes
+            $page = str_replace("\r\n", "\n", $page); // windows -> unix
+            $page = str_replace("\r", "\n", $page);   // remaining -> unix
 
+            if (!$doc->loadHTML(mb_convert_encoding($page,'UTF-8'))) {
+                foreach (libxml_get_errors() as $error) {
+                    // handle errors here
+                    $this->log_error($this->display_xml_error($error));
+                }
+                libxml_clear_errors();
+            }
+        }
         $obj = simplexml_import_dom($doc,'AdvElement');
         if( !is_object($obj)){
             // Error from generated HTML
