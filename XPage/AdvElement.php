@@ -17,7 +17,7 @@ class AdvElement extends SimpleXMLElement {
      * 
      * @param string $name
      * @param string $value
-     * @return advAdmin_simpleXML (SimpleXMLElement)
+     * @return AdvElement (SimpleXMLElement)
      */
     public function prependChild($name, $value='')
     {
@@ -37,7 +37,7 @@ class AdvElement extends SimpleXMLElement {
      * See also: http://stackoverflow.com/questions/3418019/simplexml-append-one-tree-to-another
      * 
      * @param simpleXML $child
-     * @return simpleXML (advAdmin) 
+     * @return AdvElement
      */
     public function importChild($child){
         // in case some idiot gives us a string
@@ -46,6 +46,10 @@ class AdvElement extends SimpleXMLElement {
         }
         
         $domBit = dom_import_simplexml($child);
+        if($this->getName()==''){
+            // hustan we have a problem
+            return false;
+        }
         $Dself   = dom_import_simplexml($this);    
         
         $domBit = $Dself->ownerDocument->importNode($domBit, TRUE);
