@@ -48,6 +48,19 @@ class AEWrapper {
         return $result;
     }
     
+    public function __set($name,$value) {
+        try {
+            $result = $this->MyAE->{$name} = $value;
+        } catch (Exception $e) {
+            $this->log_error('AEWrapper caught exception: ',  $e->getMessage());
+            return FALSE;
+        }
+        if(is_object($result)){
+            return new AEWrapper($result,$this);
+        }
+        return $result;
+    }  
+    
     public function __get($name) {
         try {
             $result = $this->MyAE->{$name};
