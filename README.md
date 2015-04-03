@@ -1,7 +1,9 @@
 # XPage
 A project to create an Object Orient approach to polyglot XHTML5 page manipulation
 
-At present there are two files to this project:
+For suggested uses and in depth documentation see the [wiki](https://github.com/lordmatt/XPage/wiki)
+
+At present there are two additional files to this project:
 
 ## AdvElement
 AE extends SimpleXMLElement and adds a few "missing" features.
