@@ -19,6 +19,8 @@ class XPage {
     
     // A list of pointers
     protected $namedZones = array();
+    protected $meta = array();
+    protected $keywords = array();
 
     /**
      * Takes a HTML document (as string) or a path to a XHTML document
@@ -52,7 +54,114 @@ class XPage {
             return FALSE;
         }        
         $this->page = new AEWrapper($obj,$this);
-
+    }
+    
+    /**
+     * attributes should be in key value pairs in $value as an array or value 
+     * should be a string.
+     * @param string $what
+     * @param mixed $value
+     * @return \XPage 
+     */
+    public function &setMeta($what,$value){
+        $method_name = "_meta_{$what}";
+        if(method_exists($this, $method_name)){
+            $this->$method_name($value);
+        }else{
+            if(is_array($values)){
+                $this->meta[]=array('type'=>$what,'values'=>$value);
+            }else{
+                $this->meta[]=array('type'=>$what,'values'=>array('tcontent'=>$value));
+            }
+        }
+        return $this;
+    }
+    
+    /**
+     * Function for specifying meta tag data where the attributes are name and 
+     * content only.
+     * @param string $name
+     * @param string $content
+     * @return \XPage 
+     */
+    public function &setMetaName($name,$content){
+        $this->meta[]=array('type'=>'meta','values'=>array('name'=>$name,'content'=>$content));
+        return $this;
+    }
+    /**
+     * Sets the title content
+     * @param string $newTitle
+     * @return \XPage 
+     */
+    public function &updateTitle($newTitle){
+        $this->meta['title']=array('type'=>'title','values'=>array('tcontent'=>$newTitle));
+        return $this;
+    }
+    
+    public function &addKeyword($word){
+        if($this->keywords===false){
+            return $this;
+        }
+        $this->keywords[$word]=true;
+        return $this;
+    }
+    
+    public function &dropKeyword($word){
+        if($this->keywords===false){
+            return $this;
+        }
+        unset($this->keywords[$word]);
+        return $this;
+    }
+    
+    public function getKeywords(){
+        return array_keys($this->keywords);
+    }
+    
+    protected function _meta_title($value){
+        $this->updateTitle($value);
+    }
+    
+    protected function _meta_set_meta($pointless=null){
+        $xml = $this->page->actual_simpleXML_obj_please();
+        foreach($this->meta as $meta){
+            $newMeta = null;
+            if(isset($meta['values']['tcontent'])){
+                $newMeta = $xml->head->addChild($meta['type'],$meta['values']['tcontent']);
+                unset($meta['values']['tcontent']);
+            }else{
+                $newMeta = $xml->head->addChild($meta['type']);
+            }
+            if(count($meta['values'])>0){
+                foreach($meta['values'] as $a=>$b){
+                    $newMeta->addAttribute($a,$b);
+                }
+            }
+        }
+        unset($this->meta);
+    }
+    
+    protected function keywords_to_meta(){
+        if($this->keywords===false){
+            return false;
+        }
+        $metaStr = implode(',',$this->keywords);
+        $this->meta[] = array('type'=>'meta','values'=>array('name'=>'keywords','content'=>$metaStr));
+        $this->keywords=false;
+        return true;
+    }
+    
+    protected function _meta_css($value){
+        $values=array('rel'=>'stylesheet','type'=>'text/css','href'=>$value);
+        if(is_array($value)){
+            if(!isset($value['href'])){
+                return false;
+            }
+            foreach($value as $a=>$b){
+                $values[$a]=$b;
+            }
+        }
+        $this->meta[]=array('type'=>'link','values'=>$values);
     }
     
     public function register_as($name,$what){
@@ -105,6 +214,8 @@ class XPage {
     */
 
     public function asHTML($forceDoctype=true){
+        $this->keywords_to_meta();
+        $this->_meta_set_meta(null);
         $doc = dom_import_simplexml($this->page->actual_simpleXML_obj_please());
         $doc->ownerDocument->encoding = 'iso-8859-1';
         $doc->ownerDocument->preserveWhiteSpace = false;
